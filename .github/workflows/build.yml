@@ -1,0 +1,30 @@
+name: Build Jovian Harmony VST3
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            name: windows
+          - os: macos-14
+            name: macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jovian-harmony-${{ matrix.name }}
+          path: |
+            build/JovianHarmony_artefacts/Release/VST3/**
+            build/JovianHarmony_artefacts/VST3/**
+            build/JovianHarmony_artefacts/Release/Standalone/**
+            build/JovianHarmony_artefacts/Standalone/**
